@@ -131,3 +131,44 @@ select *from Employeeinfo;
 select MAX(salary) AS "SecondHighestSalary"
 From EmployeePosition
 where salary<(select max(salary) from EmployeePosition)
+
+/*Sub query example
+Select max(marks) from (select * from Student where City ="Delray") as temp; 
+"here temp acts a like temporary table"
+*/
+
+/*
+Views Concept (Important)
+-----------------
+CREATE VIEW view1 as
+SELECT rollno,name from Student;
+
+SELECT *FROM view1
+we can drop views
+drop view view1
+
+*/
+
+/*
+Joins
+Inner Join
+Returns records that having matching values in both tables
+syntax
+----------
+select column(s) 
+from tableA
+inner join tableB
+on tableA.col_name = tableB.col_name;
+----------
+
+Left join and Right join same syntax
+Returns all records from the left table, and the matched records in right table
+syntax
+----------
+select column(s) 
+from tableA
+left join tableB
+on tableA.col_name = tableB.col_name;
+
+--------
+*/
