@@ -136,3 +136,86 @@ app.UseStaticFiles();
 app.UseRouting();
 app.MapDefaultControllerRoute();
 app.Run();
+
+// Controllers/TasksController.cs
+using Microsoft.AspNetCore.Mvc;
+using TaskManager.Models;
+using TaskManager.Repositories;
+
+namespace TaskManager.Controllers
+{
+    public class TasksController : Controller
+    {
+        private readonly ITaskRepository _repository;
+
+        public TasksController(ITaskRepository repository)
+        {
+            _repository = repository;
+        }
+
+        public IActionResult Index()
+        {
+            var tasks = _repository.GetAll();
+            return View(tasks);
+        }
+
+        public IActionResult Details(int id)
+        {
+            var task = _repository.GetById(id);
+            if (task == null) return NotFound();
+            return View(task);
+        }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(TaskDto dto)
+        {
+            if (ModelState.IsValid)
+            {
+                _repository.Add(dto);
+                _repository.Save();
+                return RedirectToAction("Index");
+            }
+            return View(dto);
+        }
+
+        public IActionResult Edit(int id)
+        {
+            var task = _repository.GetById(id);
+            if (task == null) return NotFound();
+            return View(task);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(TaskDto dto)
+        {
+            if (ModelState.IsValid)
+            {
+                _repository.Update(dto);
+                _repository.Save();
+                return RedirectToAction("Index");
+            }
+            return View(dto);
+        }
+
+        public IActionResult Delete(int id)
+        {
+            var task = _repository.GetById(id);
+            if (task == null) return NotFound();
+            return View(task);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            _repository.Delete(id);
+            _repository.Save();
+            return RedirectToAction("Index");
+        }
+    }
+}
+
