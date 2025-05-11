@@ -126,3 +126,12 @@ namespace TaskManagerApp.Controllers
         }
     }
 }
+
+
+
+
+
+
+
+builder.Services.AddDbContext<TaskDbContext>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
