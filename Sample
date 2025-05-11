@@ -219,3 +219,96 @@ namespace TaskManager.Controllers
     }
 }
 
+
+
+@model TaskManager.Models.TaskDto
+
+<h2>Create Task</h2>
+
+<form asp-action="Create" method="post">
+    <div>
+        <label asp-for="TaskDescription"></label>
+        <input asp-for="TaskDescription" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="StartDate"></label>
+        <input asp-for="StartDate" type="date" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="ExpectedClosureDate"></label>
+        <input asp-for="ExpectedClosureDate" type="date" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="AssignedTo"></label>
+        <input asp-for="AssignedTo" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="CompletionStatus"></label>
+        <input asp-for="CompletionStatus" type="checkbox" />
+    </div>
+    <button type="submit" class="btn btn-success">Create</button>
+</form>
+
+<a href="/Tasks">Back to List</a>
+
+@model TaskManager.Models.TaskDto
+
+<h2>Edit Task</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="TaskID" />
+    <div>
+        <label asp-for="TaskDescription"></label>
+        <input asp-for="TaskDescription" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="StartDate"></label>
+        <input asp-for="StartDate" type="date" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="ExpectedClosureDate"></label>
+        <input asp-for="ExpectedClosureDate" type="date" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="AssignedTo"></label>
+        <input asp-for="AssignedTo" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="CompletionStatus"></label>
+        <input asp-for="CompletionStatus" type="checkbox" />
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<a href="/Tasks">Back to List</a>
+@model TaskManager.Models.TaskDto
+
+<h2>Delete Task</h2>
+
+<div>
+    <p><strong>Description:</strong> @Model.TaskDescription</p>
+    <p><strong>Start Date:</strong> @Model.StartDate.ToShortDateString()</p>
+    <p><strong>Expected Closure:</strong> @Model.ExpectedClosureDate.ToShortDateString()</p>
+    <p><strong>Assigned To:</strong> @Model.AssignedTo</p>
+    <p><strong>Status:</strong> @(Model.CompletionStatus ? "Completed" : "Pending")</p>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="TaskID" />
+    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+</form>
+
+<a href="/Tasks">Cancel</a>
+@model TaskManager.Models.TaskDto
+
+<h2>Task Details</h2>
+
+<p><strong>Description:</strong> @Model.TaskDescription</p>
+<p><strong>Start Date:</strong> @Model.StartDate.ToShortDateString()</p>
+<p><strong>Expected Closure:</strong> @Model.ExpectedClosureDate.ToShortDateString()</p>
+<p><strong>Assigned To:</strong> @Model.AssignedTo</p>
+<p><strong>Status:</strong> @(Model.CompletionStatus ? "Completed" : "Pending")</p>
+
+<a href="/Tasks">Back to List</a> |
+<a href="/Tasks/Edit/@Model.TaskID">Edit</a>
+
