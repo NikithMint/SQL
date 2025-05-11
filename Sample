@@ -1,137 +1,129 @@
-dotnet ef dbcontext scaffold "Server=localhost;Database=TaskDb;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models -f
-A connection was successfully established with the server, but then an error occurred during the login process. (provider: SSL Provider, error: 0 - The certificate chain was issued by an authority that is not trusted.)
-using System.Collections.Generic;
-using TaskManagerApp.Models;
+@model IEnumerable<TaskManagerApp.Models.Tasks>
 
-namespace TaskManagerApp.DataAccess
-{
-    public interface ITaskRepository
-    {
-        IEnumerable<Tasks> GetAllTasks();
-        Tasks GetTaskById(int id);
-        void AddTask(Tasks task);
-        void UpdateTask(Tasks task);
-        void DeleteTask(int id);
-        void Save();
-    }
+@{
+    ViewData["Title"] = "All Tasks";
 }
 
-using System.Collections.Generic;
-using System.Linq;
-using TaskManagerApp.Models;
+<h2>All Tasks</h2>
+<a asp-action="Create">Create New Task</a>
 
-namespace TaskManagerApp.DataAccess
-{
-    public class TaskRepository : ITaskRepository
+<table class="table">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Start Date</th>
+            <th>Expected Closure</th>
+            <th>Assigned To</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var task in Model)
     {
-        private readonly TaskDbContext _context;
-
-        public TaskRepository(TaskDbContext context)
-        {
-            _context = context;
-        }
-
-        public IEnumerable<Tasks> GetAllTasks() => _context.Tasks.ToList();
-
-        public Tasks GetTaskById(int id) => _context.Tasks.Find(id);
-
-        public void AddTask(Tasks task)
-        {
-            _context.Tasks.Add(task);
-            Save();
-        }
-
-        public void UpdateTask(Tasks task)
-        {
-            _context.Tasks.Update(task);
-            Save();
-        }
-
-        public void DeleteTask(int id)
-        {
-            var task = _context.Tasks.Find(id);
-            if (task != null)
-            {
-                _context.Tasks.Remove(task);
-                Save();
-            }
-        }
-
-        public void Save()
-        {
-            _context.SaveChanges();
-        }
+        <tr>
+            <td>@task.TaskDescription</td>
+            <td>@task.StartDate.ToShortDateString()</td>
+            <td>@task.ExpectedClosureDate.ToShortDateString()</td>
+            <td>@task.AssignedTo</td>
+            <td>@(task.CompletionStatus ? "Completed" : "Pending")</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@task.TaskId">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@task.TaskId">Delete</a>
+            </td>
+        </tr>
     }
+    </tbody>
+</table>
+
+@model TaskManagerApp.Models.Tasks
+
+@{
+    ViewData["Title"] = "Create Task";
 }
 
+<h2>Create New Task</h2>
 
-using Microsoft.AspNetCore.Mvc;
-using TaskManagerApp.DataAccess;
-using TaskManagerApp.Models;
+<form asp-action="Create">
+    <div>
+        <label>Task Description</label>
+        <input asp-for="TaskDescription" class="form-control" />
+    </div>
+    <div>
+        <label>Start Date</label>
+        <input asp-for="StartDate" type="date" class="form-control" />
+    </div>
+    <div>
+        <label>Expected Closure Date</label>
+        <input asp-for="ExpectedClosureDate" type="date" class="form-control" />
+    </div>
+    <div>
+        <label>Assigned To</label>
+        <input asp-for="AssignedTo" class="form-control" />
+    </div>
+    <div>
+        <label>Completion Status</label>
+        <input asp-for="CompletionStatus" type="checkbox" />
+    </div>
+    <br />
+    <button type="submit">Save</button>
+</form>
 
-namespace TaskManagerApp.Controllers
-{
-    public class TasksController : Controller
-    {
-        private readonly ITaskRepository _repo;
+@model TaskManagerApp.Models.Tasks
 
-        public TasksController(ITaskRepository repo)
-        {
-            _repo = repo;
-        }
-
-        public IActionResult Index()
-        {
-            var tasks = _repo.GetAllTasks();
-            return View(tasks);
-        }
-
-        public IActionResult Create() => View();
-
-        [HttpPost]
-        public IActionResult Create(Tasks task)
-        {
-            if (ModelState.IsValid)
-            {
-                _repo.AddTask(task);
-                return RedirectToAction("Index");
-            }
-            return View(task);
-        }
-
-        public IActionResult Edit(int id)
-        {
-            var task = _repo.GetTaskById(id);
-            return View(task);
-        }
-
-        [HttpPost]
-        public IActionResult Edit(Tasks task)
-        {
-            _repo.UpdateTask(task);
-            return RedirectToAction("Index");
-        }
-
-        public IActionResult Delete(int id)
-        {
-            var task = _repo.GetTaskById(id);
-            return View(task);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            _repo.DeleteTask(id);
-            return RedirectToAction("Index");
-        }
-    }
+@{
+    ViewData["Title"] = "Edit Task";
 }
 
+<h2>Edit Task</h2>
+
+<form asp-action="Edit">
+    <input type="hidden" asp-for="TaskId" />
+
+    <div>
+        <label>Task Description</label>
+        <input asp-for="TaskDescription" class="form-control" />
+    </div>
+    <div>
+        <label>Start Date</label>
+        <input asp-for="StartDate" type="date" class="form-control" />
+    </div>
+    <div>
+        <label>Expected Closure Date</label>
+        <input asp-for="ExpectedClosureDate" type="date" class="form-control" />
+    </div>
+    <div>
+        <label>Assigned To</label>
+        <input asp-for="AssignedTo" class="form-control" />
+    </div>
+    <div>
+        <label>Completion Status</label>
+        <input asp-for="CompletionStatus" type="checkbox" />
+    </div>
+    <br />
+    <button type="submit">Update</button>
+</form>
+
+@model TaskManagerApp.Models.Tasks
+
+@{
+    ViewData["Title"] = "Delete Task";
+}
+
+<h2>Delete Task</h2>
+
+<div>
+    <h4>Are you sure you want to delete this?</h4>
+    <p>
+        <strong>Description:</strong> @Model.TaskDescription<br />
+        <strong>Assigned To:</strong> @Model.AssignedTo
+    </p>
+
+    <form asp-action="DeleteConfirmed">
+        <input type="hidden" asp-for="TaskId" />
+        <button type="submit">Yes, Delete</button>
+        <a asp-action="Index">Cancel</a>
+    </form>
+</div>
 
 
-
-
-
-
-builder.Services.AddDbContext<TaskDbContext>();
-builder.Services.AddScoped<ITaskRepository, TaskRepository>();
