@@ -1,0 +1,5 @@
+dotnet ef dbcontext scaffold "Server=localhost;Database=TaskManagerDB;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -o DAL -t Tasks --force
+dotnet tool install --global dotnet-ef
+
+
+
