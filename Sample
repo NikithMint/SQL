@@ -312,3 +312,36 @@ namespace TaskManager.Controllers
 <a href="/Tasks">Back to List</a> |
 <a href="/Tasks/Edit/@Model.TaskID">Edit</a>
 
+@model IEnumerable<TaskManager.Models.TaskDto>
+
+<h2>Tasks</h2>
+<a class="btn btn-primary" href="/Tasks/Create">Create New Task</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Start Date</th>
+            <th>Expected Closure</th>
+            <th>Assigned To</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var task in Model)
+        {
+            <tr>
+                <td>@task.TaskDescription</td>
+                <td>@task.StartDate.ToShortDateString()</td>
+                <td>@task.ExpectedClosureDate.ToShortDateString()</td>
+                <td>@task.AssignedTo</td>
+                <td>@(task.CompletionStatus ? "Completed" : "Pending")</td>
+                <td>
+                    <a href="/Tasks/Details/@task.TaskID">Details</a> |
+                    <a href="/Tasks/Edit/@task.TaskID">Edit</a> |
+                    <a href="/Tasks/Delete/@task.TaskID">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
