@@ -1,2 +1,128 @@
 dotnet ef dbcontext scaffold "Server=localhost;Database=TaskDb;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -o Models -f
 A connection was successfully established with the server, but then an error occurred during the login process. (provider: SSL Provider, error: 0 - The certificate chain was issued by an authority that is not trusted.)
+using System.Collections.Generic;
+using TaskManagerApp.Models;
+
+namespace TaskManagerApp.DataAccess
+{
+    public interface ITaskRepository
+    {
+        IEnumerable<Tasks> GetAllTasks();
+        Tasks GetTaskById(int id);
+        void AddTask(Tasks task);
+        void UpdateTask(Tasks task);
+        void DeleteTask(int id);
+        void Save();
+    }
+}
+
+using System.Collections.Generic;
+using System.Linq;
+using TaskManagerApp.Models;
+
+namespace TaskManagerApp.DataAccess
+{
+    public class TaskRepository : ITaskRepository
+    {
+        private readonly TaskDbContext _context;
+
+        public TaskRepository(TaskDbContext context)
+        {
+            _context = context;
+        }
+
+        public IEnumerable<Tasks> GetAllTasks() => _context.Tasks.ToList();
+
+        public Tasks GetTaskById(int id) => _context.Tasks.Find(id);
+
+        public void AddTask(Tasks task)
+        {
+            _context.Tasks.Add(task);
+            Save();
+        }
+
+        public void UpdateTask(Tasks task)
+        {
+            _context.Tasks.Update(task);
+            Save();
+        }
+
+        public void DeleteTask(int id)
+        {
+            var task = _context.Tasks.Find(id);
+            if (task != null)
+            {
+                _context.Tasks.Remove(task);
+                Save();
+            }
+        }
+
+        public void Save()
+        {
+            _context.SaveChanges();
+        }
+    }
+}
+
+
+using Microsoft.AspNetCore.Mvc;
+using TaskManagerApp.DataAccess;
+using TaskManagerApp.Models;
+
+namespace TaskManagerApp.Controllers
+{
+    public class TasksController : Controller
+    {
+        private readonly ITaskRepository _repo;
+
+        public TasksController(ITaskRepository repo)
+        {
+            _repo = repo;
+        }
+
+        public IActionResult Index()
+        {
+            var tasks = _repo.GetAllTasks();
+            return View(tasks);
+        }
+
+        public IActionResult Create() => View();
+
+        [HttpPost]
+        public IActionResult Create(Tasks task)
+        {
+            if (ModelState.IsValid)
+            {
+                _repo.AddTask(task);
+                return RedirectToAction("Index");
+            }
+            return View(task);
+        }
+
+        public IActionResult Edit(int id)
+        {
+            var task = _repo.GetTaskById(id);
+            return View(task);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Tasks task)
+        {
+            _repo.UpdateTask(task);
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult Delete(int id)
+        {
+            var task = _repo.GetTaskById(id);
+            return View(task);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            _repo.DeleteTask(id);
+            return RedirectToAction("Index");
+        }
+    }
+}
