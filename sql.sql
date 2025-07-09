@@ -172,3 +172,12 @@ on tableA.col_name = tableB.col_name;
 
 --------
 */
+/* SQL Table Copy
+    
+SELECT * INTO New_table_name FROM old_table_name;
+
+*/
+
+
+
+
